@@ -9,6 +9,7 @@ public class Shot {
     private double yPos;
     private double xVel;
     private double yVel;
+    private boolean alive = true;
 
     public Shot(double xPos, double yPos, double angle) {
         this.xPos = xPos;
@@ -30,6 +31,9 @@ public class Shot {
     }
 
     public String outOfBounds(WindowSizeManager manager) {
+        if (!alive) {
+            return "";
+        }
         if (yPos > manager.bottomBound) {
             return "bottom";
         }
@@ -46,6 +50,10 @@ public class Shot {
             return "left";
         }
         return "none";
+    }
+
+    public void unalive() {
+        alive = false;
     }
 
     public double getXPos() {

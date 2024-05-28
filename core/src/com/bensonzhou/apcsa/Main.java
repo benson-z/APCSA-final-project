@@ -145,6 +145,7 @@ public class Main extends ApplicationAdapter {
             // Check for collisions with shots
             for (Shot shot : p.getShots()) {
                 if (enemy.hit(shot.getXPos(), shot.getYPos())) {
+                    shot.unalive();
                     score++;
                 }
             }

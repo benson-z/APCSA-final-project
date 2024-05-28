@@ -14,10 +14,6 @@ public class Enemy {
         alive = true;
         double angle = Math.random() * 2 * Math.PI;
         double dist = Math.sqrt(Math.pow(sizeManager.getWidth(), 2) + Math.pow(sizeManager.getHeight(), 2)) + Math.random() * spawnRadius;
-        System.out.println(sizeManager.getWidth());
-        System.out.println(sizeManager.getHeight());
-        System.out.println(dist);
-        System.out.println('a');
 
         xPos = (sizeManager.leftBound + sizeManager.rightBound) / 2 + Math.cos(angle) * dist;
         yPos = (sizeManager.topBound + sizeManager.bottomBound) / 2 + Math.sin(angle) * dist;
