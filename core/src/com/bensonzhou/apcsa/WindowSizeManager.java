@@ -9,7 +9,7 @@ public class WindowSizeManager {
     private static final double MIN_HEIGHT = 300;
     private static final double MIN_WIDTH = 500;
     private static final double RETRACT_CONSTANT = 1.0;
-    private static final double EXPAND_CONSTANT= 180;
+    private static final double EXPAND_CONSTANT = 180;
     public double leftBound;
     public double rightBound;
     public double topBound;
@@ -22,6 +22,7 @@ public class WindowSizeManager {
     private double lastMouseY;
     private double mouseX;
     private double mouseY;
+
     public WindowSizeManager() {
         double centerX = Gdx.graphics.getDisplayMode().width / 2.0;
         double centerY = Gdx.graphics.getDisplayMode().height / 2.0;
@@ -106,10 +107,8 @@ public class WindowSizeManager {
     }
 
     public void updateBounds(double deltaTime) {
-        double newLeftBound = Math.min(leftBound - deltaTime * RETRACT_CONSTANT * leftWallVel, rightBound - MIN_WIDTH);
-        double newTopBound = Math.min(topBound - deltaTime * RETRACT_CONSTANT * topWallVel, bottomBound - MIN_HEIGHT);
-        leftBound = newLeftBound;
-        topBound = newTopBound;
+        leftBound = Math.min(leftBound - deltaTime * RETRACT_CONSTANT * leftWallVel, rightBound - MIN_WIDTH);
+        topBound = Math.min(topBound - deltaTime * RETRACT_CONSTANT * topWallVel, bottomBound - MIN_HEIGHT);
         rightBound = Math.max(rightBound + deltaTime * RETRACT_CONSTANT * rightWallVel, leftBound + MIN_WIDTH);
         bottomBound = Math.max(bottomBound + deltaTime * RETRACT_CONSTANT * bottomWallVel, topBound + MIN_HEIGHT);
         leftBound = Math.max(leftBound, 0);

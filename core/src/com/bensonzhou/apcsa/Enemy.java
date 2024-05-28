@@ -2,7 +2,6 @@ package com.bensonzhou.apcsa;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import sun.jvm.hotspot.types.JDoubleField;
 
 public class Enemy {
     private static final double spawnRadius = 0;
@@ -27,15 +26,22 @@ public class Enemy {
         yVel = -Math.sin(angle) * SPEED;
     }
 
+    public static void draw(ShapeRenderer shapeRenderer, double xPos, double yPos, boolean alive) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(alive ? Color.PURPLE : Color.WHITE); // Set the color of the circle
+        shapeRenderer.circle((float) xPos, (float) yPos, 15); // Draw a circle at (100, 100) with a radius of 50
+        shapeRenderer.end();
+    }
+
     public boolean hit(double x, double y) {
-        if (Math.sqrt(Math.pow(x-xPos, 2) + Math.pow(y-yPos, 2)) < 25) {
+        if (Math.sqrt(Math.pow(x - xPos, 2) + Math.pow(y - yPos, 2)) < 25) {
             alive = false;
         }
         return !alive;
     }
 
     public void draw(ShapeRenderer shapeRenderer) {
-        if (alive);
+        if (alive) ;
     }
 
     public void update(WindowSizeManager sizeManager) {
@@ -53,12 +59,5 @@ public class Enemy {
 
     public double getyPos() {
         return yPos;
-    }
-
-    public static void draw(ShapeRenderer shapeRenderer, double xPos, double yPos, boolean alive) {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(alive ? Color.PURPLE : Color.WHITE); // Set the color of the circle
-        shapeRenderer.circle((float) xPos, (float) yPos, 15); // Draw a circle at (100, 100) with a radius of 50
-        shapeRenderer.end();
     }
 }

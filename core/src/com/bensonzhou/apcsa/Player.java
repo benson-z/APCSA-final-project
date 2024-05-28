@@ -25,6 +25,34 @@ public class Player {
         shots = new ArrayList<>();
     }
 
+    public static void draw(ShapeRenderer shapeRenderer, double xPos, double yPos) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.ROYAL); // Set the color of the circle
+        shapeRenderer.circle((float) xPos, (float) yPos, 20); // Draw a circle at (100, 100) with a radius of 50
+        shapeRenderer.end();
+    }
+
+    public static void drawTargetingLine(ShapeRenderer shapeRenderer, float x1, float y1, float angle, float length) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.SKY);
+        angle -= Math.PI / 2;
+        // Calculate the end point
+        float dx = (float) Math.cos(angle) * length;
+        float dy = (float) Math.sin(angle) * length;
+        float x2 = x1 + dx;
+        float y2 = y1 + dy;
+
+        // Calculate the perpendicular offset for thickness
+        float halfThickness = (float) PREVIEW_THICKNESS / 2;
+        float offsetX = (float) Math.sin(angle) * halfThickness;
+        float offsetY = (float) -Math.cos(angle) * halfThickness;
+
+        // Draw the two triangles forming the thick line as a quad
+        shapeRenderer.triangle(x1 - offsetX, y1 - offsetY, x1 + offsetX, y1 + offsetY, x2 + offsetX, y2 + offsetY);
+        shapeRenderer.triangle(x1 - offsetX, y1 - offsetY, x2 + offsetX, y2 + offsetY, x2 - offsetX, y2 - offsetY);
+        shapeRenderer.end();
+    }
+
     public void handleInputs() {
         boolean xInputGiven = false;
         boolean yInputGiven = false;
@@ -70,34 +98,6 @@ public class Player {
         yPos = Math.min(yPos, manager.bottomBound);
     }
 
-    public static void draw(ShapeRenderer shapeRenderer, double xPos, double yPos) {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.ROYAL); // Set the color of the circle
-        shapeRenderer.circle((float) xPos, (float) yPos, 20); // Draw a circle at (100, 100) with a radius of 50
-        shapeRenderer.end();
-    }
-
-    public static void drawTargetingLine(ShapeRenderer shapeRenderer, float x1, float y1, float angle, float length) {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.SKY);
-        angle -= Math.PI / 2;
-        // Calculate the end point
-        float dx = (float) Math.cos(angle) * length;
-        float dy = (float) Math.sin(angle) * length;
-        float x2 = x1 + dx;
-        float y2 = y1 + dy;
-
-        // Calculate the perpendicular offset for thickness
-        float halfThickness = (float) PREVIEW_THICKNESS / 2;
-        float offsetX = (float) Math.sin(angle) * halfThickness;
-        float offsetY = (float) -Math.cos(angle) * halfThickness;
-
-        // Draw the two triangles forming the thick line as a quad
-        shapeRenderer.triangle(x1 - offsetX, y1 - offsetY, x1 + offsetX, y1 + offsetY, x2 + offsetX, y2 + offsetY);
-        shapeRenderer.triangle(x1 - offsetX, y1 - offsetY, x2 + offsetX, y2 + offsetY, x2 - offsetX, y2 - offsetY);
-        shapeRenderer.end();
-    }
-
     public void shoot(WindowSizeManager sizeManager) {
         double angle = Math.atan2(sizeManager.getMouseX() - getXPos(), sizeManager.getMouseY() - getYPos());
         shots.add(new Shot(getXPos(), getYPos(), angle));
@@ -106,6 +106,7 @@ public class Player {
     public double getXPos() {
         return xPos;
     }
+
     public double getYPos() {
         return yPos;
     }

@@ -17,6 +17,13 @@ public class Shot {
         yVel = Math.cos(angle);
     }
 
+    public static void draw(ShapeRenderer shapeRenderer, double xPos, double yPos) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.WHITE); // Set the color of the circle
+        shapeRenderer.circle((float) xPos, (float) yPos, 7); // Draw a circle at (100, 100) with a radius of 50
+        shapeRenderer.end();
+    }
+
     public void updatePos(WindowSizeManager manager, double deltaTime) {
         xPos += deltaTime * xVel * SPEED;
         yPos += deltaTime * yVel * SPEED;
@@ -41,16 +48,10 @@ public class Shot {
         return "none";
     }
 
-    public static void draw(ShapeRenderer shapeRenderer, double xPos, double yPos) {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.WHITE); // Set the color of the circle
-        shapeRenderer.circle((float) xPos, (float) yPos, 7); // Draw a circle at (100, 100) with a radius of 50
-        shapeRenderer.end();
-    }
-
     public double getXPos() {
         return xPos;
     }
+
     public double getYPos() {
         return yPos;
     }
