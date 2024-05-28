@@ -2,7 +2,6 @@ package com.bensonzhou.apcsa;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -10,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Timer;
 
-import javax.print.attribute.standard.Sides;
 import java.util.ArrayList;
 
 public class Main extends ApplicationAdapter {
@@ -21,13 +19,13 @@ public class Main extends ApplicationAdapter {
     public static WindowManager windowManager;
     private WindowSizeManager sizeManager;
     private ArrayList<Enemy> enemies;
-    Player p;
+    private Player p;
     private double health = 10;
     private int score = 0;
-    int counter = 0;
+    private int counter = 0;
 
     public Main(WindowManager windowManager) {
-        Main.windowManager = windowManager;
+        this.windowManager = windowManager;
     }
 
     @Override
@@ -37,7 +35,6 @@ public class Main extends ApplicationAdapter {
         camera = new OrthographicCamera(sizeManager.getWidth(), sizeManager.getHeight());
         camera.setToOrtho(false);
 
-        // Initialize the ShapeRenderer
         shapeRenderer = new ShapeRenderer();
 
         sizeManager.resize(camera);
@@ -53,6 +50,7 @@ public class Main extends ApplicationAdapter {
                 p.shoot(sizeManager);
             }
         }, 1, 0.5f);
+
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
@@ -63,36 +61,59 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        handlePlayerActions();
+
+        handleShots();
+
+        handleEnemies();
+
+        updateCameraAndSizeManager();
+
+        clearScreenAndDrawUI();
+
+        drawObjects();
+    }
+
+    private void handlePlayerActions() {
         p.handleInputs();
         p.updatePos(sizeManager, Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isButtonJustPressed(0)) {
-        }
+    }
+
+    private void handleShots() {
         for (int i = 0; i < p.getShots().size(); i++) {
-            p.getShots().get(i).updatePos(sizeManager, Gdx.graphics.getDeltaTime());
-            String hit = p.getShots().get(i).outOfBounds(sizeManager);
+            Shot shot = p.getShots().get(i);
+            shot.updatePos(sizeManager, Gdx.graphics.getDeltaTime());
+            String hit = shot.outOfBounds(sizeManager);
             if (!hit.equals("none")) {
                 sizeManager.applyImpulse(hit, 150);
                 p.getShots().remove(i);
                 i--;
             }
         }
+    }
+
+    private void handleEnemies() {
         for (int i = 0; i < enemies.size(); i++) {
             if (!enemies.get(i).isAlive()) {
                 enemies.remove(i);
                 i--;
             }
         }
-        for (Enemy e : enemies) {
-            if (e.hit(p.getXPos(), p.getYPos())) {
+
+        for (Enemy enemy : enemies) {
+            if (enemy.hit(p.getXPos(), p.getYPos())) {
                 health--;
                 System.out.println(health);
             }
-            for (Shot s : p.getShots()) {
-                if (e.hit(s.getXPos(), s.getYPos())) {
+            for (Shot shot : p.getShots()) {
+                if (enemy.hit(shot.getXPos(), shot.getYPos())) {
                     score++;
                 }
             }
         }
+    }
+
+    private void updateCameraAndSizeManager() {
         counter++;
         if (counter % 2 == 0) {
             camera.update();
@@ -100,29 +121,37 @@ public class Main extends ApplicationAdapter {
         }
 
         sizeManager.update(Gdx.graphics.getDeltaTime());
+    }
 
+    private void clearScreenAndDrawUI() {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.begin();
         font.draw(batch, "Health: " + health, sizeManager.getRelativeX(p.getXPos()) - 40, sizeManager.getRelativeY(p.getYPos()) + 40);
         font.draw(batch, "Score: " + score, 10, sizeManager.getHeight() - 10);
         batch.end();
+    }
+
+    private void drawObjects() {
         shapeRenderer.setProjectionMatrix(camera.combined);
 
-        for (Shot s : p.getShots()) {
-            Shot.draw(shapeRenderer, sizeManager.getRelativeX(s.getXPos()), sizeManager.getRelativeY(s.getYPos()));
+        for (Shot shot : p.getShots()) {
+            Shot.draw(shapeRenderer, sizeManager.getRelativeX(shot.getXPos()), sizeManager.getRelativeY(shot.getYPos()));
         }
-        for (Enemy e : enemies) {
-            e.update(sizeManager);
-            Enemy.draw(shapeRenderer, sizeManager.getRelativeX(e.getxPos()), sizeManager.getRelativeY(e.getyPos()), e.isAlive());
+
+        for (Enemy enemy : enemies) {
+            enemy.update(sizeManager);
+            Enemy.draw(shapeRenderer, sizeManager.getRelativeX(enemy.getxPos()), sizeManager.getRelativeY(enemy.getyPos()), enemy.isAlive());
         }
+
         Player.drawTargetingLine(shapeRenderer, sizeManager.getRelativeX(p.getXPos()), sizeManager.getRelativeY(p.getYPos()), (float) Math.atan2(sizeManager.getMouseX() - p.getXPos(), sizeManager.getMouseY() - p.getYPos()), 40);
         Player.draw(shapeRenderer, sizeManager.getRelativeX(p.getXPos()), sizeManager.getRelativeY(p.getYPos()));
-
     }
 
     @Override
     public void dispose() {
+        // Clean up resources if needed
     }
 }
