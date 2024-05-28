@@ -2,6 +2,7 @@ package com.bensonzhou.apcsa;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -23,9 +24,11 @@ public class Main extends ApplicationAdapter {
     private WindowSizeManager sizeManager;
     private ArrayList<Enemy> enemies;
     private Player p;
-    private double health = 10;
-    private int score = 0;
-    private int counter = 0;
+    private double health;
+    private int score;
+    private int counter;
+    private boolean initialized = false;
+    private boolean paused;
 
     /**
      * Constructor for the Main class.
@@ -42,6 +45,10 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         sizeManager = new WindowSizeManager();
+        health = 5;
+        score = 0;
+        counter = 0;
+        paused = false;
 
         camera = new OrthographicCamera(sizeManager.getWidth(), sizeManager.getHeight());
         camera.setToOrtho(false); // Set camera to orthographic (needed for 2d)
@@ -55,21 +62,24 @@ public class Main extends ApplicationAdapter {
         font = new BitmapFont();
         enemies = new ArrayList<>();
 
-        // Shoot every 0.5 seconds
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                p.shoot(sizeManager);
-            }
-        }, 1, 0.5f);
+        if (!initialized) {
+            // Shoot every 0.5 seconds
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    p.shoot(sizeManager);
+                }
+            }, 1, 0.5f);
 
-        // spawn an enemy every 0.9 seconds
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                enemies.add(new Enemy(sizeManager));
-            }
-        }, 0, 0.9f);
+            // spawn an enemy every 0.9 seconds
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    enemies.add(new Enemy(sizeManager));
+                }
+            }, 0, 0.9f);
+        }
+        initialized = true;
     }
 
     /**
@@ -77,23 +87,42 @@ public class Main extends ApplicationAdapter {
      */
     @Override
     public void render() {
-        // Handle player inputs and movement
-        handlePlayerActions();
+        if (health <= 0) {
+            if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
+                create();
+            }
 
-        // Handle shots fired by the player
-        handleShots();
+            batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); // Set projection matrix for batch
 
-        // Handle enemy actions
-        handleEnemies();
+            batch.begin();
+            font.draw(batch, "Game Over", 10, sizeManager.getHeight() - 40); // Draw health
+            font.draw(batch, "Press Enter to restart", 10, sizeManager.getHeight() - 70); // Draw score
+            batch.end();
+        }
+        else {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+                paused = !paused;
+            }
+            if (!paused) {
+                // Handle player inputs and movement
+                handlePlayerActions();
 
-        // Update camera and size manager
-        updateCameraAndSizeManager();
+                // Handle shots fired by the player
+                handleShots();
 
-        // Clear screen and draw UI
-        clearScreenAndDrawUI();
+                // Handle enemy actions
+                handleEnemies();
 
-        // Draw all game objects
-        drawObjects();
+                // Update camera and size manager
+                updateCameraAndSizeManager();
+
+                // Clear screen and draw UI
+                clearScreenAndDrawUI();
+
+                // Draw all game objects
+                drawObjects();
+            }
+        }
     }
 
     /**
